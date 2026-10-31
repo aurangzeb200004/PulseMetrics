@@ -1,0 +1,29 @@
+{
+  "name": "@pulsemetrics/sdk",
+  "version": "1.0.0",
+  "description": "Ultra-lightweight real-time telemetry SDK for Node.js, Express, and Next.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": ["telemetry", "observability", "metrics", "monitoring", "latency", "apm"],
+  "author": "PulseMetrics Team",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.5",
+    "typescript": "^5.3.3"
+  },
+  "peerDependencies": {
+    "express": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "express": {
+      "optional": true
+    }
+  }
+}
+
