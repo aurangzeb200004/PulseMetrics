@@ -27,13 +27,17 @@ export function useWebSocket(
   const connect = useCallback(() => {
     if (!projectId) return;
 
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+    // WebSockets are only available when a WS_URL is explicitly set.
+    // On Vercel, we rely on polling (useMetrics 15s auto-refresh) instead.
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL;
+    if (!wsUrl) {
+      setConnectionState('disconnected');
       return;
     }
 
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001';
-    setConnectionState('connecting');
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) return;
 
+    setConnectionState('connecting');
     try {
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
@@ -47,27 +51,18 @@ export function useWebSocket(
       ws.onmessage = (event) => {
         try {
           const parsed = JSON.parse(event.data);
-          if (onMessageRef.current) {
-            onMessageRef.current(parsed);
-          }
-        } catch {
-          // Ignore unparseable frames
-        }
+          onMessageRef.current?.(parsed);
+        } catch { /* ignore */ }
       };
 
       ws.onclose = () => {
         setConnectionState('disconnected');
-        // Exponential backoff reconnect
         const backoff = Math.min(1000 * Math.pow(1.5, retryCountRef.current), 15000);
         retryCountRef.current++;
-        reconnectTimeoutRef.current = setTimeout(() => {
-          connect();
-        }, backoff);
+        reconnectTimeoutRef.current = setTimeout(connect, backoff);
       };
 
-      ws.onerror = () => {
-        ws.close();
-      };
+      ws.onerror = () => ws.close();
     } catch {
       setConnectionState('disconnected');
     }
@@ -75,15 +70,11 @@ export function useWebSocket(
 
   useEffect(() => {
     connect();
-
     return () => {
       if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
+      wsRef.current?.close();
     };
   }, [connect]);
 
   return { connectionState };
 }
-

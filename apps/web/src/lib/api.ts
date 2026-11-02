@@ -1,4 +1,6 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+// Use relative URLs so the frontend works on any host (Vercel, localhost, custom domain).
+// Set NEXT_PUBLIC_API_URL only when the backend is deployed separately.
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 export const api = {
   // Projects
@@ -30,10 +32,7 @@ export const api = {
     if (from) params.set('from', from.toString());
     if (to) params.set('to', to.toString());
     if (endpoint) params.set('endpoint', endpoint);
-
-    const res = await fetch(`${API_BASE}/api/metrics/${projectId}?${params.toString()}`, {
-      cache: 'no-store',
-    });
+    const res = await fetch(`${API_BASE}/api/metrics/${projectId}?${params.toString()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch metrics');
     return res.json();
   },
@@ -83,7 +82,7 @@ export const api = {
     return res.json();
   },
 
-  // Alert Rules
+  // Alerts
   getAlerts: async (projectId: string) => {
     const res = await fetch(`${API_BASE}/api/alerts/${projectId}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch alerts');
@@ -115,10 +114,9 @@ export const api = {
   testAlertWebhook: async (id: string) => {
     const res = await fetch(`${API_BASE}/api/alerts/${id}/test`, { method: 'POST' });
     if (!res.ok) {
-      const err = await res.json();
+      const err = await res.json().catch(() => ({ error: 'Failed' }));
       throw new Error(err.error || 'Failed to send test alert');
     }
     return res.json();
   },
 };
-
