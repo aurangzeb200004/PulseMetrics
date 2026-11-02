@@ -1,16 +1,31 @@
 {
   "name": "pulsemetrics",
   "version": "1.0.0",
-  "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "description": "Real-time Developer & App Telemetry Suite",
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=apps/api\" \"npm run dev --workspace=apps/web\"",
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start",
     "dev:api": "npm run dev --workspace=apps/api",
-    "dev:web": "npm run dev --workspace=apps/web",
-    "build": "npm run build --workspaces",
-    "install:all": "npm install"
+    "build:api": "npm run build --workspace=apps/api",
+    "build:sdk": "npm run build --workspace=packages/sdk"
+  },
+  "dependencies": {
+    "next": "14.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.10.3",
+    "lucide-react": "^0.309.0",
+    "clsx": "^2.1.0",
+    "tailwind-merge": "^2.2.0"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "typescript": "^5.3.3",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@types/node": "^20.11.5",
+    "tailwindcss": "^3.4.1",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.33"
   }
 }
